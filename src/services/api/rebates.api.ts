@@ -2,9 +2,12 @@ import BaseApiService from './base.api';
 import { 
   RebateCalculation, 
   RebateValidation, 
-  RebateForecast 
+  RebateForecast,
+  ForecastParameters,
+  ForecastAnalytics
 } from '@types/rebate.types';
 import { PaginatedResponse } from '@types/api.types';
+import { mockForecastingService } from '@services/mock/mockForecastingService';
 
 class RebatesApiService extends BaseApiService {
   async getRebateCalculations(params?: {
@@ -44,8 +47,62 @@ class RebatesApiService extends BaseApiService {
   }
 
   async getRebateForecasts(contractId?: string): Promise<RebateForecast[]> {
-    const response = await this.get<RebateForecast[]>('/rebates/forecasts', { contractId });
-    return response.data;
+    try {
+      const response = await this.get<RebateForecast[]>('/rebates/forecasts', { contractId });
+      return response.data;
+    } catch (error) {
+      console.log('API unavailable, using mock forecasting service');
+      return await mockForecastingService.generateForecasts({ contractId });
+    }
+  }
+
+  async generateForecasts(params: ForecastParameters): Promise<RebateForecast[]> {
+    try {
+      const response = await this.post<RebateForecast[]>('/rebates/forecasts/generate', params);
+      return response.data;
+    } catch (error) {
+      console.log('API unavailable, using mock forecasting service');
+      return await mockForecastingService.generateForecasts(params);
+    }
+  }
+
+  async getForecastAnalytics(forecasts: RebateForecast[]): Promise<ForecastAnalytics> {
+    try {
+      const response = await this.post<ForecastAnalytics>('/rebates/forecasts/analytics', { forecasts });
+      return response.data;
+    } catch (error) {
+      console.log('API unavailable, using mock forecasting service');
+      return await mockForecastingService.getForecastAnalytics(forecasts);
+    }
+  }
+
+  async getForecastAccuracy(): Promise<{
+    period: string;
+    predicted: number;
+    actual: number;
+    accuracy: number;
+  }[]> {
+    try {
+      const response = await this.get<any[]>('/rebates/forecasts/accuracy');
+      return response.data;
+    } catch (error) {
+      console.log('API unavailable, using mock forecasting service');
+      return await mockForecastingService.getHistoricalAccuracy();
+    }
+  }
+
+  async simulateForecastScenarios(forecasts: RebateForecast[]): Promise<{
+    scenario: string;
+    description: string;
+    forecasts: RebateForecast[];
+  }[]> {
+    try {
+      const response = await this.post<any[]>('/rebates/forecasts/scenarios', { forecasts });
+      return response.data;
+    } catch (error) {
+      console.log('API unavailable, using mock forecasting service');
+      return await mockForecastingService.simulateScenarios(forecasts);
+    }
   }
 
   async updateRebateStatus(id: string, status: string): Promise<RebateCalculation> {

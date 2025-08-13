@@ -22,14 +22,41 @@ export interface RebateValidation {
 }
 
 export interface RebateForecast {
+  id: string;
+  contractId: string;
   period: string;
   projectedAmount: number;
   confidence: number;
   factors: ForecastFactor[];
+  createdAt: string;
+  forecastType: 'quarterly' | 'annual' | 'monthly';
+  baselineAmount?: number;
+  growthRate?: number;
 }
 
 export interface ForecastFactor {
   factor: string;
   impact: number;
   description: string;
+  weight: number;
+}
+
+export interface ForecastParameters {
+  contractId?: string;
+  startPeriod?: string;
+  endPeriod?: string;
+  forecastType?: 'quarterly' | 'annual' | 'monthly';
+  includeHistorical?: boolean;
+}
+
+export interface ForecastAnalytics {
+  totalProjectedRevenue: number;
+  averageConfidence: number;
+  riskFactors: string[];
+  opportunities: string[];
+  trendAnalysis: {
+    direction: 'up' | 'down' | 'stable';
+    percentage: number;
+    description: string;
+  };
 }
