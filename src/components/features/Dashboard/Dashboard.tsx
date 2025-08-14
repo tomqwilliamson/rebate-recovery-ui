@@ -115,7 +115,7 @@ export const Dashboard: React.FC = () => {
       {/* Welcome Header */}
       <motion.div variants={itemVariants} className="text-center py-8">
         <h1 className="text-4xl font-bold text-gradient mb-4">
-          Welcome to Rebate Recovery
+          Welcome to Rebate Recovery by Quisitive
         </h1>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
           Streamline your medical supplies rebate management with AI-powered contract processing and analytics

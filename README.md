@@ -1,4 +1,4 @@
-# Rebate Recovery System - React UI
+# Rebate Recovery System by Quisitive - React UI
 
 A modern, ultra-vibrant React application for managing medical supplies rebate recovery processes.
 

@@ -33,19 +33,25 @@ export const RebateForecasting: React.FC = () => {
       <h1 className="text-3xl font-bold text-gradient">Rebate Forecasting</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="col-span-2">
-          <h2 className="text-xl font-semibold mb-4">Projected Rebates</h2>
-          <div className="h-[400px]">
-            <TrendChart 
-              data={formatData(mockForecasts)}
-              height={400}
-            />
+        <Card className="col-span-2 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-lg font-semibold text-slate-900">Projected Rebates</h2>
+          </div>
+          <div className="p-6">
+            <div className="h-[400px]">
+              <TrendChart 
+                data={formatData(mockForecasts)}
+                height={400}
+              />
+            </div>
           </div>
         </Card>
 
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">Forecast Details</h2>
-          <div className="space-y-4">
+        <Card className="overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-lg font-semibold text-slate-900">Forecast Details</h2>
+          </div>
+          <div className="p-6 space-y-4">
             {mockForecasts.map((forecast, index) => (
               <div key={index} className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
                 <div>
@@ -60,9 +66,11 @@ export const RebateForecasting: React.FC = () => {
           </div>
         </Card>
 
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">Impact Factors</h2>
-          <div className="space-y-4">
+        <Card className="overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-lg font-semibold text-slate-900">Impact Factors</h2>
+          </div>
+          <div className="p-6 space-y-4">
             {mockFactors.map((factor, index) => (
               <div key={index} className="p-4 bg-white/50 rounded-lg">
                 <div className="flex justify-between items-center mb-2">

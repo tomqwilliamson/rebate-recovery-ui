@@ -69,7 +69,7 @@ export const Header: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
               <span className="text-white font-bold text-sm">R</span>
             </div>
-            <h1 className="text-xl font-bold text-gradient">Rebate Recovery</h1>
+            <h1 className="text-xl font-bold text-gradient">Rebate Recovery by Quisitive</h1>
           </div>
         </div>
 

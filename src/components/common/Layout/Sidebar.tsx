@@ -102,7 +102,7 @@ export const Sidebar: React.FC = () => {
                 <span className="text-white font-bold">R</span>
               </div>
               <div>
-                <h2 className="font-bold text-slate-900">Rebate Recovery</h2>
+                <h2 className="font-bold text-slate-900">Rebate Recovery by Quisitive</h2>
                 <p className="text-xs text-slate-500">Medical Supplies</p>
               </div>
             </div>

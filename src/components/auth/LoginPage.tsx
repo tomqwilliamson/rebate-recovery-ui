@@ -91,7 +91,7 @@ export const LoginPage: React.FC = () => {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center animate-glow">
                 <span className="text-white font-bold text-xl">R</span>
               </div>
-              <h1 className="text-3xl font-bold text-white">Rebate Recovery</h1>
+              <h1 className="text-3xl font-bold text-white">Rebate Recovery by Quisitive</h1>
             </div>
 
             <h2 className="text-4xl font-bold text-white mb-6 leading-tight">

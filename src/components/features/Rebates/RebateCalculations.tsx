@@ -15,6 +15,7 @@ import {
 import { Button } from '@components/common/UI/Button';
 import { Card } from '@components/common/UI/Card';
 import { formatCurrency, formatDate } from '@utils/formatters';
+import { RebateDetailDialog } from './RebateDetailDialog';
 
 interface RebateCalculation {
   id: string;
@@ -71,6 +72,8 @@ const mockCalculations: RebateCalculation[] = [
 export const RebateCalculations: React.FC = () => {
   const [calculations, setCalculations] = useState<RebateCalculation[]>(mockCalculations);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [selectedCalculation, setSelectedCalculation] = useState<RebateCalculation | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 
   const runCalculations = async () => {
     setIsCalculating(true);
@@ -78,6 +81,16 @@ export const RebateCalculations: React.FC = () => {
     setTimeout(() => {
       setIsCalculating(false);
     }, 3000);
+  };
+
+  const handleViewDetails = (calculation: RebateCalculation) => {
+    setSelectedCalculation(calculation);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handleCloseDetailDialog = () => {
+    setIsDetailDialogOpen(false);
+    setSelectedCalculation(null);
   };
 
   const getStatusBadge = (status: string) => {
@@ -283,7 +296,11 @@ export const RebateCalculations: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
-                      <Button variant="secondary" size="sm">
+                      <Button 
+                        variant="secondary" 
+                        size="sm"
+                        onClick={() => handleViewDetails(calculation)}
+                      >
                         View Details
                       </Button>
                       {calculation.status === 'calculated' && (
@@ -324,6 +341,13 @@ export const RebateCalculations: React.FC = () => {
           </div>
         </Card>
       )}
+
+      {/* Rebate Detail Dialog */}
+      <RebateDetailDialog 
+        isOpen={isDetailDialogOpen}
+        onClose={handleCloseDetailDialog}
+        calculation={selectedCalculation}
+      />
     </div>
   );
 };
