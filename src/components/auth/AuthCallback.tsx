@@ -24,3 +24,4 @@ export const AuthCallback: React.FC = () => {
       </div>
     </div>
   );
+};

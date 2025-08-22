@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TrendChart from '@components/common/Charts/TrendChart';
+import { AlertsModal } from './AlertsModal';
 import { 
   FileText, 
   DollarSign, 
@@ -36,6 +38,8 @@ const itemVariants = {
 };
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const [isAlertsModalOpen, setIsAlertsModalOpen] = useState(false);
   const quickStats = [
     {
       title: 'Active Contracts',
@@ -102,6 +106,25 @@ export const Dashboard: React.FC = () => {
         return `${baseClasses} bg-red-100 text-red-700`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-700`;
+    }
+  };
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'upload':
+        navigate('/contracts/upload');
+        break;
+      case 'analytics':
+        navigate('/analytics');
+        break;
+      case 'contracts':
+        navigate('/contracts');
+        break;
+      case 'alerts':
+        setIsAlertsModalOpen(true);
+        break;
+      default:
+        console.log(`Action ${action} not implemented yet`);
     }
   };
 
@@ -188,6 +211,7 @@ export const Dashboard: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg hover:shadow-xl transition-all btn-vibrant"
+              onClick={() => handleQuickAction('upload')}
             >
               <Upload className="w-8 h-8 mb-2" />
               <span className="font-medium">Upload Contract</span>
@@ -197,6 +221,7 @@ export const Dashboard: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all btn-vibrant"
+              onClick={() => handleQuickAction('analytics')}
             >
               <TrendingUp className="w-8 h-8 mb-2" />
               <span className="font-medium">View Analytics</span>
@@ -206,6 +231,7 @@ export const Dashboard: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all btn-vibrant"
+              onClick={() => handleQuickAction('contracts')}
             >
               <FileText className="w-8 h-8 mb-2" />
               <span className="font-medium">Browse Contracts</span>
@@ -215,6 +241,7 @@ export const Dashboard: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg hover:shadow-xl transition-all btn-vibrant"
+              onClick={() => handleQuickAction('alerts')}
             >
               <AlertTriangle className="w-8 h-8 mb-2" />
               <span className="font-medium">Review Alerts</span>
@@ -270,6 +297,12 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Alerts Modal */}
+      <AlertsModal 
+        isOpen={isAlertsModalOpen} 
+        onClose={() => setIsAlertsModalOpen(false)} 
+      />
     </motion.div>
   );
 };

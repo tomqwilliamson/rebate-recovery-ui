@@ -5,14 +5,26 @@ import {
   RebateForecast, 
   ForecastParameters,
   ForecastAnalytics 
-} from '@types/rebate.types';
-import { PaginatedResponse } from '@types/api.types';
+} from '../../types/rebate.types';
+import { ValidationRule, ValidationReport } from '@services/mock/mockValidationService';
+import { PaginatedResponse } from '../../types/api.types';
 import { rebatesApi } from '@services/api/rebates.api';
+import { mockValidationService } from '@services/mock/mockValidationService';
 
 interface RebatesState {
   calculations: RebateCalculation[];
   currentCalculation: RebateCalculation | null;
   validations: RebateValidation[];
+  validationRules: ValidationRule[];
+  validationReports: ValidationReport[];
+  currentValidationReport: ValidationReport | null;
+  validationMetrics: {
+    totalValidationsRun: number;
+    successRate: number;
+    averageExecutionTime: number;
+    commonFailures: { rule: string; count: number }[];
+    trendData: { date: string; passed: number; failed: number; warnings: number }[];
+  } | null;
   forecasts: RebateForecast[];
   forecastAnalytics: ForecastAnalytics | null;
   forecastScenarios: {
@@ -33,6 +45,7 @@ interface RebatesState {
     totalPages: number;
   };
   loading: boolean;
+  validationLoading: boolean;
   forecastLoading: boolean;
   error: string | null;
   filters: {
@@ -47,6 +60,10 @@ const initialState: RebatesState = {
   calculations: [],
   currentCalculation: null,
   validations: [],
+  validationRules: [],
+  validationReports: [],
+  currentValidationReport: null,
+  validationMetrics: null,
   forecasts: [],
   forecastAnalytics: null,
   forecastScenarios: [],
@@ -58,6 +75,7 @@ const initialState: RebatesState = {
     totalPages: 0,
   },
   loading: false,
+  validationLoading: false,
   forecastLoading: false,
   error: null,
   filters: {
@@ -115,7 +133,7 @@ export const createRebateCalculation = createAsyncThunk(
 
 export const fetchRebateForecasts = createAsyncThunk(
   'rebates/fetchForecasts',
-  async (contractId?: string, { rejectWithValue }) => {
+  async (contractId: string | undefined = undefined, { rejectWithValue }) => {
     try {
       const forecasts = await rebatesApi.getRebateForecasts(contractId);
       return forecasts;
@@ -173,6 +191,66 @@ export const simulateForecastScenarios = createAsyncThunk(
   }
 );
 
+export const fetchValidationRules = createAsyncThunk(
+  'rebates/fetchValidationRules',
+  async (_, { rejectWithValue }) => {
+    try {
+      const rules = await rebatesApi.getValidationRules();
+      return rules;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const runValidation = createAsyncThunk(
+  'rebates/runValidation',
+  async (params: { rebateCalculationId: string; validationType?: string }, { rejectWithValue }) => {
+    try {
+      const report = await rebatesApi.runValidation(params.rebateCalculationId, params.validationType);
+      return report;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchValidationHistory = createAsyncThunk(
+  'rebates/fetchValidationHistory',
+  async (rebateCalculationId: string, { rejectWithValue }) => {
+    try {
+      const history = await rebatesApi.getValidationHistory(rebateCalculationId);
+      return history;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchValidationMetrics = createAsyncThunk(
+  'rebates/fetchValidationMetrics',
+  async (_, { rejectWithValue }) => {
+    try {
+      const metrics = await rebatesApi.getValidationMetrics();
+      return metrics;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateValidationRule = createAsyncThunk(
+  'rebates/updateValidationRule',
+  async (params: { ruleId: string; updates: Partial<ValidationRule> }, { rejectWithValue }) => {
+    try {
+      const updatedRule = await rebatesApi.updateValidationRule(params.ruleId, params.updates);
+      return updatedRule;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const rebatesSlice = createSlice({
   name: 'rebates',
   initialState,
@@ -193,6 +271,12 @@ const rebatesSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    clearValidationReport: (state) => {
+      state.currentValidationReport = null;
+    },
+    setValidationFilters: (state, action: PayloadAction<{ contractId?: string; status?: string }>) => {
+      // Future validation filtering logic
     },
   },
   extraReducers: (builder) => {
@@ -246,6 +330,41 @@ const rebatesSlice = createSlice({
       })
       .addCase(simulateForecastScenarios.fulfilled, (state, action) => {
         state.forecastScenarios = action.payload;
+      })
+      .addCase(fetchValidationRules.fulfilled, (state, action) => {
+        state.validationRules = action.payload;
+      })
+      .addCase(runValidation.pending, (state) => {
+        state.validationLoading = true;
+        state.error = null;
+      })
+      .addCase(runValidation.fulfilled, (state, action) => {
+        state.validationLoading = false;
+        state.currentValidationReport = action.payload;
+        const existingReportIndex = state.validationReports.findIndex(
+          report => report.rebateCalculationId === action.payload.rebateCalculationId
+        );
+        if (existingReportIndex !== -1) {
+          state.validationReports[existingReportIndex] = action.payload;
+        } else {
+          state.validationReports.push(action.payload);
+        }
+      })
+      .addCase(runValidation.rejected, (state, action) => {
+        state.validationLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchValidationHistory.fulfilled, (state, action) => {
+        state.validationReports = action.payload;
+      })
+      .addCase(fetchValidationMetrics.fulfilled, (state, action) => {
+        state.validationMetrics = action.payload;
+      })
+      .addCase(updateValidationRule.fulfilled, (state, action) => {
+        const ruleIndex = state.validationRules.findIndex(rule => rule.id === action.payload.id);
+        if (ruleIndex !== -1) {
+          state.validationRules[ruleIndex] = action.payload;
+        }
       });
   },
 });
@@ -255,6 +374,8 @@ export const {
   setForecastParameters, 
   clearCurrentCalculation, 
   clearForecasts, 
-  clearError 
+  clearError,
+  clearValidationReport,
+  setValidationFilters
 } = rebatesSlice.actions;
 export default rebatesSlice.reducer;
