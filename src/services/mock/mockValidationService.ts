@@ -91,32 +91,41 @@ class MockValidationService {
     }
   ];
 
-  private mockValidations: RebateValidation[] = [
-    {
-      id: 'v-001',
-      rebateCalculationId: 'calc-001',
-      validationType: 'general_ledger',
-      status: 'passed',
-      details: 'All general ledger entries match rebate calculations',
-      validatedAt: new Date().toISOString()
-    },
-    {
-      id: 'v-002',
-      rebateCalculationId: 'calc-001',
-      validationType: 'contract_terms',
-      status: 'warning',
-      details: 'Rebate tier achievement is close to threshold (95% of required volume)',
-      validatedAt: new Date().toISOString()
-    },
-    {
-      id: 'v-003',
-      rebateCalculationId: 'calc-001',
-      validationType: 'item_matching',
-      status: 'passed',
-      details: 'All product codes successfully matched between systems',
-      validatedAt: new Date().toISOString()
-    }
-  ];
+  private generateMockValidations(rebateCalculationId: string): RebateValidation[] {
+    const timestamp = new Date().toISOString();
+    return [
+      {
+        id: `v-${rebateCalculationId}-gl`,
+        rebateCalculationId,
+        validationType: 'general_ledger',
+        status: Math.random() > 0.8 ? 'warning' : 'passed',
+        details: Math.random() > 0.8 
+          ? 'Minor variance detected in GL account reconciliation (within acceptable range)'
+          : 'All general ledger entries match rebate calculations perfectly',
+        validatedAt: timestamp
+      },
+      {
+        id: `v-${rebateCalculationId}-ct`,
+        rebateCalculationId,
+        validationType: 'contract_terms',
+        status: Math.random() > 0.7 ? 'warning' : 'passed',
+        details: Math.random() > 0.7
+          ? 'Rebate tier achievement is close to threshold (92-98% of required volume)'
+          : 'All contract terms validated successfully, tier requirements met',
+        validatedAt: timestamp
+      },
+      {
+        id: `v-${rebateCalculationId}-im`,
+        rebateCalculationId,
+        validationType: 'item_matching',
+        status: Math.random() > 0.9 ? 'failed' : 'passed',
+        details: Math.random() > 0.9
+          ? 'Product code mismatch detected in 3 items - manual review required'
+          : `All product codes successfully matched (${Math.floor(Math.random() * 500) + 800} items verified)`,
+        validatedAt: timestamp
+      }
+    ];
+  }
 
   async getValidationRules(): Promise<ValidationRule[]> {
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -136,45 +145,17 @@ class MockValidationService {
   async runValidation(rebateCalculationId: string, validationType?: string): Promise<ValidationReport> {
     await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
     
+    // Generate fresh validation data for this specific calculation
+    const allValidations = this.generateMockValidations(rebateCalculationId);
+    
     const validationsToRun = validationType 
-      ? this.mockValidations.filter(v => v.validationType === validationType)
-      : this.mockValidations.filter(v => v.rebateCalculationId === rebateCalculationId);
+      ? allValidations.filter(v => v.validationType === validationType)
+      : allValidations;
 
-    const totalChecks = 8;
-    const passedChecks = Math.floor(Math.random() * 3) + 5;
+    const totalChecks = validationsToRun.length * 3; // Multiple checks per validation type
+    const passedChecks = Math.floor(Math.random() * 3) + Math.max(totalChecks - 4, 0);
     const failedChecks = Math.floor(Math.random() * 2);
     const warningChecks = totalChecks - passedChecks - failedChecks;
-
-    const validations: RebateValidation[] = [
-      {
-        id: `v-${Date.now()}-1`,
-        rebateCalculationId,
-        validationType: 'general_ledger',
-        status: failedChecks > 0 ? 'failed' : 'passed',
-        details: failedChecks > 0 
-          ? 'Variance detected in GL account 4500-REV: Expected $135,000, Found $132,000' 
-          : 'All general ledger entries reconciled successfully',
-        validatedAt: new Date().toISOString()
-      },
-      {
-        id: `v-${Date.now()}-2`,
-        rebateCalculationId,
-        validationType: 'contract_terms',
-        status: warningChecks > 0 ? 'warning' : 'passed',
-        details: warningChecks > 0
-          ? 'Volume threshold achieved at 98% - close monitoring recommended'
-          : 'All contract terms validated successfully',
-        validatedAt: new Date().toISOString()
-      },
-      {
-        id: `v-${Date.now()}-3`,
-        rebateCalculationId,
-        validationType: 'item_matching',
-        status: 'passed',
-        details: 'Product code matching: 1,247 items matched, 0 discrepancies',
-        validatedAt: new Date().toISOString()
-      }
-    ];
 
     const overallStatus: 'passed' | 'failed' | 'warning' = 
       failedChecks > 0 ? 'failed' : 
@@ -187,10 +168,10 @@ class MockValidationService {
       passedChecks,
       failedChecks,
       warningChecks,
-      validations,
+      validations: validationsToRun,
       overallStatus,
       validatedAt: new Date().toISOString(),
-      validatedBy: 'System Validator',
+      validatedBy: 'Demo User',
       executionTime: 2500 + Math.random() * 2000
     };
   }
@@ -198,34 +179,37 @@ class MockValidationService {
   async getValidationHistory(rebateCalculationId: string): Promise<ValidationReport[]> {
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    return [
-      {
-        id: 'report-1',
+    // Generate historical validation reports for any rebate calculation ID
+    const historyCount = Math.floor(Math.random() * 3) + 2; // 2-4 historical reports
+    const history: ValidationReport[] = [];
+    
+    for (let i = 0; i < historyCount; i++) {
+      const daysAgo = (i + 1) * Math.floor(Math.random() * 3 + 1); // 1-3 days apart
+      const totalChecks = 9;
+      const passedChecks = Math.floor(Math.random() * 3) + 5;
+      const failedChecks = Math.floor(Math.random() * 2);
+      const warningChecks = totalChecks - passedChecks - failedChecks;
+      
+      const overallStatus: 'passed' | 'failed' | 'warning' = 
+        failedChecks > 0 ? 'failed' : 
+        warningChecks > 0 ? 'warning' : 'passed';
+      
+      history.push({
+        id: `report-${rebateCalculationId}-${i + 1}`,
         rebateCalculationId,
-        totalChecks: 8,
-        passedChecks: 6,
-        failedChecks: 1,
-        warningChecks: 1,
-        validations: this.mockValidations.filter(v => v.rebateCalculationId === rebateCalculationId),
-        overallStatus: 'failed',
-        validatedAt: new Date(Date.now() - 86400000).toISOString(),
-        validatedBy: 'Demo User',
-        executionTime: 3200
-      },
-      {
-        id: 'report-2',
-        rebateCalculationId,
-        totalChecks: 8,
-        passedChecks: 7,
-        failedChecks: 0,
-        warningChecks: 1,
-        validations: this.mockValidations.filter(v => v.rebateCalculationId === rebateCalculationId),
-        overallStatus: 'warning',
-        validatedAt: new Date(Date.now() - 43200000).toISOString(),
-        validatedBy: 'Demo User',
-        executionTime: 2800
-      }
-    ];
+        totalChecks,
+        passedChecks,
+        failedChecks,
+        warningChecks,
+        validations: this.generateMockValidations(rebateCalculationId),
+        overallStatus,
+        validatedAt: new Date(Date.now() - (daysAgo * 86400000)).toISOString(),
+        validatedBy: Math.random() > 0.5 ? 'Demo User' : 'System Validator',
+        executionTime: 2000 + Math.random() * 2000
+      });
+    }
+    
+    return history.reverse(); // Most recent first
   }
 
   async getValidationMetrics(): Promise<{
