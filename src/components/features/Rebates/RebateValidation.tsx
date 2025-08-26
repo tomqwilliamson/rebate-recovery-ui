@@ -32,15 +32,18 @@ import {
 
 export const RebateValidation: React.FC = () => {
   const dispatch = useDispatch();
+  const rebateState = useSelector((state: RootState) => state.rebates);
+  
+  // Destructure with fallbacks to prevent undefined errors
   const { 
-    calculations, 
-    currentValidationReport, 
-    validationReports, 
-    validationRules, 
-    validationMetrics,
-    validationLoading, 
-    loading 
-  } = useSelector((state: RootState) => state.rebates);
+    calculations = [], 
+    currentValidationReport = null, 
+    validationReports = [], 
+    validationRules = [], 
+    validationMetrics = null,
+    validationLoading = false, 
+    loading = false 
+  } = rebateState || {};
 
   const [selectedCalculation, setSelectedCalculation] = useState<string>('');
   const [selectedValidationType, setSelectedValidationType] = useState<string>('all');
@@ -55,18 +58,18 @@ export const RebateValidation: React.FC = () => {
 
   useEffect(() => {
     console.log('📊 RebateValidation: Data status check', {
-      calculationsCount: calculations.length,
-      validationRulesCount: validationRules.length,
-      validationReportsCount: validationReports.length,
+      calculationsCount: calculations?.length || 0,
+      validationRulesCount: validationRules?.length || 0,
+      validationReportsCount: validationReports?.length || 0,
       hasValidationMetrics: !!validationMetrics
     });
     
     // Load sample validation history when we have calculations
-    if (calculations.length > 0 && validationReports.length === 0) {
+    if (calculations?.length > 0 && validationReports?.length === 0) {
       console.log('📈 Loading validation history for first calculation');
       dispatch(fetchValidationHistory(calculations[0].id) as any);
     }
-  }, [calculations, validationRules, validationReports.length, validationMetrics, dispatch]);
+  }, [calculations, validationRules, validationReports, validationMetrics, dispatch]);
 
   const handleRunValidation = async () => {
     if (selectedCalculation) {
@@ -238,9 +241,9 @@ export const RebateValidation: React.FC = () => {
                   className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">
-                    {calculations.length === 0 ? 'Loading calculations...' : 'Select calculation...'}
+                    {(calculations?.length || 0) === 0 ? 'Loading calculations...' : 'Select calculation...'}
                   </option>
-                  {calculations.map(calc => (
+                  {(calculations || []).map(calc => (
                     <option key={calc.id} value={calc.id}>
                       {calc.contractId} - {calc.period} (Expected: {formatCurrency(calc.expectedAmount)})
                     </option>
@@ -329,7 +332,7 @@ export const RebateValidation: React.FC = () => {
                 {/* Validation Details */}
                 <div className="space-y-3">
                   <h3 className="text-md font-medium text-slate-900">Validation Results</h3>
-                  {currentValidationReport.validations.map((validation, index) => (
+                  {(currentValidationReport.validations || []).map((validation, index) => (
                     <motion.div
                       key={validation.id}
                       initial={{ opacity: 0, x: -20 }}
@@ -362,13 +365,13 @@ export const RebateValidation: React.FC = () => {
       {activeTab === 'rules' && (
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Validation Rules</h2>
-          {validationRules.length === 0 ? (
+          {(validationRules?.length || 0) === 0 ? (
             <div className="text-center py-8">
               <div className="text-slate-500">Loading validation rules...</div>
             </div>
           ) : (
             <div className="space-y-3">
-              {validationRules.map((rule) => (
+              {(validationRules || []).map((rule) => (
               <div key={rule.id} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
@@ -437,7 +440,7 @@ export const RebateValidation: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {validationReports.map((report) => (
+                {(validationReports || []).map((report) => (
                   <tr key={report.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4 text-sm text-slate-900">{report.id}</td>
                     <td className="px-6 py-4">
