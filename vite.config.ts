@@ -19,6 +19,18 @@ export default defineConfig({
           });
         };
       }
+    },
+    {
+      name: 'security-headers',
+      configureServer(server) {
+        server.middlewares.use((req: any, res: any, next: () => void) => {
+          // Add security headers
+          res.setHeader('X-Content-Type-Options', 'nosniff');
+          // Add cache control header
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          next();
+        });
+      }
     }
   ],
   resolve: {
@@ -39,6 +51,13 @@ export default defineConfig({
         target: 'https://localhost:7001',
         changeOrigin: true,
         secure: false
+      }
+    }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
       }
     }
   }
