@@ -73,6 +73,20 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BFEB7B6A164446B6B10C758DBB55C0D4 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8D7131F6299946868957C0635076847F }}
 
+      - name: 'Clean Azure Web App'
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            # Stop the app
+            az webapp stop --name appsrv-bhj-rebates-eastus2 --resource-group $(az webapp show --name appsrv-bhj-rebates-eastus2 --query resourceGroup -o tsv)
+            
+            # Clean deployment cache
+            az webapp deployment source delete --name appsrv-bhj-rebates-eastus2 --resource-group $(az webapp show --name appsrv-bhj-rebates-eastus2 --query resourceGroup -o tsv) || true
+            
+            # Restart the app  
+            az webapp start --name appsrv-bhj-rebates-eastus2 --resource-group $(az webapp show --name appsrv-bhj-rebates-eastus2 --query resourceGroup -o tsv)
+
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -80,4 +94,5 @@ jobs:
           app-name: 'appsrv-bhj-rebates-eastus2'
           slot-name: 'Production'
           package: .
+          clean: true
           
