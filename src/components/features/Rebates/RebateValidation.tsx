@@ -32,7 +32,7 @@ import {
 import { ValidationReport } from '@services/mock/mockValidationService';
 import type { RebateValidation } from '@/types/rebate.types';
 
-export const RebateValidation: React.FC = () => {
+export const RebateValidationPage: React.FC = () => {
   const dispatch = useDispatch();
   const rebateState = useSelector((state: RootState) => state.rebates);
   
@@ -620,3 +620,6 @@ export const RebateValidation: React.FC = () => {
     </div>
   );
 };
+
+// Default export for backward compatibility
+export const RebateValidation = RebateValidationPage;
