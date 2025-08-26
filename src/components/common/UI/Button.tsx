@@ -1,8 +1,8 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 import { clsx } from 'clsx';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends HTMLMotionProps<'button'> {
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
