@@ -100,6 +100,7 @@ class MockRebateCalculationsService {
     status?: string;
     period?: string;
   }): Promise<PaginatedResponse<RebateCalculation>> {
+    console.log('📋 MockRebateCalculationsService: Getting rebate calculations', params);
     await new Promise(resolve => setTimeout(resolve, 300));
 
     let filteredCalculations = [...this.mockCalculations];
