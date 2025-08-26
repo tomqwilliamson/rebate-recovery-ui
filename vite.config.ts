@@ -59,6 +59,13 @@ export default defineConfig({
       output: {
         manualChunks: undefined
       }
+    },
+    target: 'esnext',
+    minify: 'terser',
+    terserOptions: {
+      format: {
+        comments: false
+      }
     }
   }
 })
