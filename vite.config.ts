@@ -35,6 +35,15 @@ export default defineConfig({
           next();
         });
       }
+    },
+    {
+      name: 'logging',
+      configureServer(server) {
+        server.middlewares.use((req: any, res: any, next: () => void) => {
+          console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+          next();
+        });
+      }
     }
   ],
   resolve: {
