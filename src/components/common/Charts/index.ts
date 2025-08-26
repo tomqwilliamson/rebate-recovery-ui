@@ -1,1 +1,1 @@
-export { default as TrendChart } from './TrendChart';
+export { TrendChart } from './TrendChart';

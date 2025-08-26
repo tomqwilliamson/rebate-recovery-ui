@@ -10,7 +10,7 @@ interface TrendChartProps {
   className?: string;
 }
 
-const TrendChart: React.FC<TrendChartProps> = ({ 
+export const TrendChart: React.FC<TrendChartProps> = ({ 
   data,
   height = 300,
   className = ''
