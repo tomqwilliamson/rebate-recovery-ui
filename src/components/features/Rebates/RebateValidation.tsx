@@ -29,6 +29,7 @@ import {
   fetchValidationMetrics,
   fetchRebateCalculations 
 } from '@store/slices/rebatesSlice';
+import { ValidationReport } from '@services/mock/mockValidationService';
 
 export const RebateValidation: React.FC = () => {
   const dispatch = useDispatch();
@@ -189,7 +190,7 @@ export const RebateValidation: React.FC = () => {
   };
 
   // Local state for demo
-  const [demoCurrentValidationReport, setCurrentValidationReport] = useState(null);
+  const [demoCurrentValidationReport, setCurrentValidationReport] = useState<ValidationReport | null>(null);
   const [demoValidationLoading, setValidationLoading] = useState(false);
   
   // Use demo state if available
