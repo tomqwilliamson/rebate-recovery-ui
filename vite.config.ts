@@ -3,7 +3,24 @@ import react from '@vitejs/plugin-react'
 import * as path from 'path'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'azure-health-check',
+      configureServer(server) {
+        return () => {
+          server.middlewares.use((req: any, res: any, next: () => void) => {
+            if (req.url === '/robots933456.txt') {
+              res.statusCode = 200;
+              res.end('OK');
+              return;
+            }
+            next();
+          });
+        };
+      }
+    }
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
