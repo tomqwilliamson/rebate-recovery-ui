@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Contract, Vendor, ContractType } from '@types/contract.types';
-import { PaginatedResponse } from '@types/api.types';
+import { Contract, Vendor, ContractType } from '../../types/contract.types';
+import { PaginatedResponse } from '../../types/api.types';
 import { contractsApi } from '@services/api/contracts.api';
 
 interface ContractsState {

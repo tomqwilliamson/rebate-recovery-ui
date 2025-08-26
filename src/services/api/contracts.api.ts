@@ -5,8 +5,8 @@ import {
   ContractAmendment,
   Vendor,
   ContractType 
-} from '@types/contract.types';
-import { PaginatedResponse } from '@types/api.types';
+} from '../../types/contract.types';
+import { PaginatedResponse } from '../../types/api.types';
 
 class ContractsApiService extends BaseApiService {
   async getContracts(params?: {

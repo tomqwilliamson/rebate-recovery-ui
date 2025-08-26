@@ -1,5 +1,5 @@
 import BaseApiService from './base.api';
-import { User } from '@types/user.types';
+import { User } from '../../types/user.types';
 
 class AuthApiService extends BaseApiService {
   async getProfile(): Promise<User> {

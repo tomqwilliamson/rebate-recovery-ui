@@ -1,4 +1,4 @@
-import { User } from '@types/user.types';
+import { User } from '../../types/user.types';
 import { tokenService } from './tokenService';
 
 class MockAuthService {

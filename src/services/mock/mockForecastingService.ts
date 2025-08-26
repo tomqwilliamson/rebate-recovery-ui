@@ -3,7 +3,7 @@ import {
   ForecastFactor, 
   ForecastParameters, 
   ForecastAnalytics 
-} from '@types/rebate.types';
+} from '../../types/rebate.types';
 
 class MockForecastingService {
   private generateMockFactors(): ForecastFactor[] {
