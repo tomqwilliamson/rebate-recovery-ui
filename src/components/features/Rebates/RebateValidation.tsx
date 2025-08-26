@@ -30,9 +30,9 @@ import {
   fetchRebateCalculations 
 } from '@store/slices/rebatesSlice';
 import { ValidationReport } from '@services/mock/mockValidationService';
-import type { RebateValidation } from '@/types/rebate.types';
+import type { RebateValidation as RebateValidationType } from '@/types/rebate.types';
 
-export const RebateValidationPage: React.FC = () => {
+const RebateValidationComponent: React.FC = () => {
   const dispatch = useDispatch();
   const rebateState = useSelector((state: RootState) => state.rebates);
   
@@ -621,5 +621,5 @@ export const RebateValidationPage: React.FC = () => {
   );
 };
 
-// Default export for backward compatibility
-export const RebateValidation = RebateValidationPage;
+// Export the component with the expected name
+export const RebateValidation = RebateValidationComponent;
