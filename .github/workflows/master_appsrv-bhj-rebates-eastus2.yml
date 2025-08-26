@@ -34,11 +34,18 @@ jobs:
           chmod +x deploy.sh
           ./deploy.sh
 
+      - name: Prepare deployment package
+        run: |
+          mkdir deployment-package
+          cp package.json deployment-package/
+          cp server.js deployment-package/
+          cp -r dist/ deployment-package/
+          
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: dist/
+          path: deployment-package/
 
   deploy:
     runs-on: ubuntu-latest
