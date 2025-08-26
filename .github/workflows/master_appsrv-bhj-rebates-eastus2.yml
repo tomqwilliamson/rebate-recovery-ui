@@ -46,6 +46,8 @@ jobs:
           cp deploy.cmd deployment-package/
           cp -r dist/ deployment-package/
           cp -r node_modules/ deployment-package/
+          # Add deployment timestamp to force fresh deployment
+          echo "DEPLOY_TIMESTAMP=$(date +%Y%m%d_%H%M%S)" > deployment-package/.env.deploy
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -73,20 +75,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BFEB7B6A164446B6B10C758DBB55C0D4 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8D7131F6299946868957C0635076847F }}
 
-      - name: 'Clean Azure Web App'
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            # Stop the app
-            az webapp stop --name appsrv-bhj-rebates-eastus2 --resource-group $(az webapp show --name appsrv-bhj-rebates-eastus2 --query resourceGroup -o tsv)
-            
-            # Clean deployment cache
-            az webapp deployment source delete --name appsrv-bhj-rebates-eastus2 --resource-group $(az webapp show --name appsrv-bhj-rebates-eastus2 --query resourceGroup -o tsv) || true
-            
-            # Restart the app  
-            az webapp start --name appsrv-bhj-rebates-eastus2 --resource-group $(az webapp show --name appsrv-bhj-rebates-eastus2 --query resourceGroup -o tsv)
-
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -95,4 +83,5 @@ jobs:
           slot-name: 'Production'
           package: .
           clean: true
+          restart: true
           
