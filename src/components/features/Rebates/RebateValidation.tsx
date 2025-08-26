@@ -30,7 +30,7 @@ import {
   fetchRebateCalculations 
 } from '@store/slices/rebatesSlice';
 import { ValidationReport } from '@services/mock/mockValidationService';
-import { RebateValidation } from '@/types/rebate.types';
+import type { RebateValidation } from '@/types/rebate.types';
 
 export const RebateValidation: React.FC = () => {
   const dispatch = useDispatch();
