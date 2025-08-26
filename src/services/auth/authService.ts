@@ -2,9 +2,9 @@ import { Configuration, PublicClientApplication } from '@azure/msal-browser';
 
 export const msalConfig: Configuration = {
   auth: {
-    clientId: import.meta.env.VITE_AZURE_CLIENT_ID || 'your-client-id',
-    authority: import.meta.env.VITE_AZURE_AUTHORITY || 'https://your-tenant.b2clogin.com/your-tenant.onmicrosoft.com/B2C_1_signin',
-    knownAuthorities: [import.meta.env.VITE_AZURE_KNOWN_AUTHORITY || 'your-tenant.b2clogin.com'],
+    clientId: import.meta.env.VITE_AZURE_CLIENT_ID || 'demo-client-id',
+    authority: import.meta.env.VITE_AZURE_AUTHORITY || 'https://demo-tenant.b2clogin.com/demo-tenant.onmicrosoft.com/B2C_1_signin',
+    knownAuthorities: [import.meta.env.VITE_AZURE_KNOWN_AUTHORITY || 'demo-tenant.b2clogin.com'],
     redirectUri: import.meta.env.VITE_REDIRECT_URI || window.location.origin,
   },
   cache: {
