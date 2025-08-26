@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { store } from '@store/store';
 import { msalConfig } from '@services/auth/authService';
-import App from './App';
+import App from './app';
 import './index.css';
 
 const msalInstance = new PublicClientApplication(msalConfig);
