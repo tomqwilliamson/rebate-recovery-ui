@@ -12,7 +12,7 @@ import { Analytics as AnalyticsPage, ComplianceReports } from '@components/featu
 import { UserManagement, SystemConfiguration } from '@components/features/Settings';
 import { useAuth } from '@hooks/useAuth';
 import { mockAuthService } from '@services/auth/mockAuthService';
-import './App.css';
+import './app.css';
 
 const App: React.FC = () => {
   const isAuthenticatedMsal = useIsAuthenticated();
