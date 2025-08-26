@@ -1,9 +1,23 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { readFileSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Debug logging
+console.log('Current working directory:', process.cwd());
+console.log('__dirname:', __dirname);
+console.log('Node version:', process.version);
+
+// Check if package.json exists
+try {
+  const packageJson = JSON.parse(readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+  console.log('Package.json found, dependencies:', Object.keys(packageJson.dependencies || {}));
+} catch (error) {
+  console.log('Error reading package.json:', error.message);
+}
 const app = express();
 const PORT = process.env.PORT || 3000;
 

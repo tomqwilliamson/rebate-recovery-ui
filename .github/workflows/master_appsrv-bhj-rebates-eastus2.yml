@@ -28,6 +28,8 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+          # Install only production dependencies for deployment
+          npm ci --only=production
           
       - name: Run deployment script
         run: |
@@ -43,6 +45,7 @@ jobs:
           cp .deployment deployment-package/
           cp deploy.cmd deployment-package/
           cp -r dist/ deployment-package/
+          cp -r node_modules/ deployment-package/
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
