@@ -24,6 +24,8 @@ export interface ValidationReport {
 }
 
 class MockValidationService {
+  private readonly serviceVersion = '2.0.1'; // Updated for dynamic validation data
+  
   private validationRules: ValidationRule[] = [
     {
       id: 'gl-001',
@@ -129,6 +131,7 @@ class MockValidationService {
 
   async getValidationRules(): Promise<ValidationRule[]> {
     await new Promise(resolve => setTimeout(resolve, 300));
+    console.log(`MockValidationService v${this.serviceVersion} - Loading validation rules`);
     return this.validationRules;
   }
 
@@ -145,6 +148,7 @@ class MockValidationService {
   async runValidation(rebateCalculationId: string, validationType?: string): Promise<ValidationReport> {
     await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
     
+    console.log(`MockValidationService v${this.serviceVersion} - Running validation for ${rebateCalculationId}`);
     // Generate fresh validation data for this specific calculation
     const allValidations = this.generateMockValidations(rebateCalculationId);
     

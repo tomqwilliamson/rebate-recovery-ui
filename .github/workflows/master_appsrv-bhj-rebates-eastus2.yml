@@ -46,8 +46,11 @@ jobs:
           cp deploy.cmd deployment-package/
           cp -r dist/ deployment-package/
           cp -r node_modules/ deployment-package/
-          # Add deployment timestamp to force fresh deployment
+          # Add deployment timestamp and cache buster to force fresh deployment
           echo "DEPLOY_TIMESTAMP=$(date +%Y%m%d_%H%M%S)" > deployment-package/.env.deploy
+          echo "CACHE_BUST=$(date +%s)" >> deployment-package/.env.deploy
+          # Create a deployment marker file
+          echo "Validation mock data updated: $(date)" > deployment-package/DEPLOYMENT_MARKER.txt
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
