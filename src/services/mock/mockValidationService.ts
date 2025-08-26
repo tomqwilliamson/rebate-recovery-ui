@@ -24,7 +24,13 @@ export interface ValidationReport {
 }
 
 class MockValidationService {
-  private readonly serviceVersion = '2.0.1'; // Updated for dynamic validation data
+  private readonly serviceVersion = '2.0.1-NUCLEAR'; // Updated for dynamic validation data
+  
+  constructor() {
+    // NUCLEAR OPTION: Log immediately when service is created
+    console.log('🚀 NUCLEAR DEPLOYMENT: MockValidationService v' + this.serviceVersion + ' LOADED!');
+    console.log('🎯 If you see this message, the new validation service is deployed!');
+  }
   
   private validationRules: ValidationRule[] = [
     {
