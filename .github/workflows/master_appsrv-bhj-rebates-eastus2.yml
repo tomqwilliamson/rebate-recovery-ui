@@ -28,6 +28,9 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+          # Install production dependencies fresh for deployment
+          rm -rf node_modules
+          npm install --production
           
       - name: Run deployment script
         run: |
@@ -43,12 +46,13 @@ jobs:
           cp .deployment deployment-package/
           cp deploy.cmd deployment-package/
           cp -r dist/ deployment-package/
-          # DO NOT copy node_modules - let Azure build fresh
+          # Copy production node_modules with Express included
+          cp -r node_modules/ deployment-package/
           # Add deployment timestamp and cache buster to force fresh deployment
           echo "DEPLOY_TIMESTAMP=$(date +%Y%m%d_%H%M%S)" > deployment-package/.env.deploy
           echo "CACHE_BUST=$(date +%s)" >> deployment-package/.env.deploy
           # Create a deployment marker file with mock service version
-          echo "MockValidationService v2.0.1 deployed: $(date)" > deployment-package/DEPLOYMENT_MARKER.txt
+          echo "MockValidationService v2.0.1-NUCLEAR with Express: $(date)" > deployment-package/DEPLOYMENT_MARKER.txt
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4

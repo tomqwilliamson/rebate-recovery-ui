@@ -60,17 +60,8 @@ IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
-:: 2. Clean install npm packages (force fresh install)
-IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
-  pushd "%DEPLOYMENT_TARGET%"
-  echo Cleaning npm cache and installing fresh packages
-  call npm cache clean --force
-  rmdir /s /q node_modules 2>nul
-  echo Installing npm packages for production
-  call npm ci --only=production
-  IF !ERRORLEVEL! NEQ 0 goto error
-  popd
-)
+:: 2. Skip npm install since we're deploying node_modules
+echo Skipping npm install - production node_modules already included in deployment
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 goto end
