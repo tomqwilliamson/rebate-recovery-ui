@@ -30,6 +30,7 @@ import {
   fetchRebateCalculations 
 } from '@store/slices/rebatesSlice';
 import { ValidationReport } from '@services/mock/mockValidationService';
+import { RebateValidation } from '@/types/rebate.types';
 
 export const RebateValidation: React.FC = () => {
   const dispatch = useDispatch();
@@ -150,29 +151,29 @@ export const RebateValidation: React.FC = () => {
           {
             id: `v-${Date.now()}-1`,
             rebateCalculationId: selectedCalculation,
-            validationType: 'general_ledger',
-            status: 'passed',
+            validationType: 'general_ledger' as const,
+            status: 'passed' as const,
             details: 'All general ledger entries reconciled successfully. Variance within acceptable range (0.2%)',
             validatedAt: new Date().toISOString()
           },
           {
             id: `v-${Date.now()}-2`,
             rebateCalculationId: selectedCalculation,
-            validationType: 'contract_terms',
-            status: 'warning',
+            validationType: 'contract_terms' as const,
+            status: 'warning' as const,
             details: 'Volume threshold achieved at 97% - close monitoring recommended for next quarter',
             validatedAt: new Date().toISOString()
           },
           {
             id: `v-${Date.now()}-3`,
             rebateCalculationId: selectedCalculation,
-            validationType: 'item_matching',
-            status: 'failed',
+            validationType: 'item_matching' as const,
+            status: 'failed' as const,
             details: 'Product code mismatch detected in 3 items: PROD-4471, PROD-8832, PROD-9901 - requires manual review',
             validatedAt: new Date().toISOString()
           }
         ],
-        overallStatus: 'warning',
+        overallStatus: 'warning' as const,
         validatedAt: new Date().toISOString(),
         validatedBy: 'Demo User',
         executionTime: 3250 + Math.random() * 1000
