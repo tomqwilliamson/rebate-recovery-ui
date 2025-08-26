@@ -26,8 +26,12 @@ export default defineConfig({
         server.middlewares.use((req: any, res: any, next: () => void) => {
           // Add security headers
           res.setHeader('X-Content-Type-Options', 'nosniff');
-          // Add cache control header
-          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          // Add security headers
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;");
+          res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+          res.setHeader('Permissions-Policy', 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()');
+          res.setHeader('X-Frame-Options', 'SAMEORIGIN');
           next();
         });
       }
