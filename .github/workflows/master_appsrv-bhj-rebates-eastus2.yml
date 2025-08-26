@@ -41,6 +41,7 @@ jobs:
           cp package-lock.json deployment-package/
           cp server.js deployment-package/
           cp .deployment deployment-package/
+          cp deploy.cmd deployment-package/
           cp -r dist/ deployment-package/
           
       - name: Upload artifact for deployment job
