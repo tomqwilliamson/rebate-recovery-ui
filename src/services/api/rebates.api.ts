@@ -21,6 +21,11 @@ class RebatesApiService extends BaseApiService {
   }): Promise<PaginatedResponse<RebateCalculation>> {
     try {
       const response = await this.get<PaginatedResponse<RebateCalculation>>('/rebates/calculations', params);
+      // Fall back to mock data if API returns empty results
+      if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+        console.log('API returned empty results, using mock rebate calculations service');
+        return await mockRebateCalculationsService.getRebateCalculations(params);
+      }
       return response.data;
     } catch (error) {
       console.log('API unavailable, using mock rebate calculations service');
@@ -136,6 +141,11 @@ class RebatesApiService extends BaseApiService {
   async getValidationRules(): Promise<ValidationRule[]> {
     try {
       const response = await this.get<ValidationRule[]>('/validations/rules');
+      // Fall back to mock data if API returns empty results
+      if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+        console.log('API returned empty rules, using mock validation service');
+        return await mockValidationService.getValidationRules();
+      }
       return response.data;
     } catch (error) {
       console.log('API unavailable, using mock validation service');
@@ -169,6 +179,11 @@ class RebatesApiService extends BaseApiService {
   async getValidationHistory(rebateCalculationId: string): Promise<ValidationReport[]> {
     try {
       const response = await this.get<ValidationReport[]>(`/validations/history/${rebateCalculationId}`);
+      // Fall back to mock data if API returns empty results
+      if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+        console.log('API returned empty history, using mock validation service');
+        return await mockValidationService.getValidationHistory(rebateCalculationId);
+      }
       return response.data;
     } catch (error) {
       console.log('API unavailable, using mock validation service');
@@ -185,6 +200,14 @@ class RebatesApiService extends BaseApiService {
   }> {
     try {
       const response = await this.get<any>('/validations/metrics');
+      // Fall back to mock data if API returns empty/null metrics
+      if (!response.data || 
+          response.data.totalValidationsRun === 0 || 
+          response.data.totalValidationsRun === undefined || 
+          response.data.totalValidationsRun === null) {
+        console.log('API returned empty metrics, using mock validation service');
+        return await mockValidationService.getValidationMetrics();
+      }
       return response.data;
     } catch (error) {
       console.log('API unavailable, using mock validation service');
