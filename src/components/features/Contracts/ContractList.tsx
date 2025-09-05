@@ -5,7 +5,7 @@ import {
   Filter, 
   Download, 
   Eye, 
-  Edit,
+  Trash2,
   Calendar,
   Building,
   DollarSign,
@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@components/common/UI/Button';
 import { Card } from '@components/common/UI/Card';
+import { ContractDetailsModal } from './ContractDetailsModal';
+import { ContractUploadModal } from './ContractUploadModal';
+import { AdvancedFiltersModal, FilterValues } from './AdvancedFiltersModal';
 
 interface Contract {
   id: string;
@@ -95,6 +98,62 @@ export const ContractList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('name');
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'edit'>('view');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [showDropdownId, setShowDropdownId] = useState<string | null>(null);
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterValues>({
+    dateRange: 'all',
+    customStartDate: '',
+    customEndDate: '',
+    status: [],
+    valueMin: '',
+    valueMax: '',
+    rebateRateMin: '',
+    rebateRateMax: '',
+    complianceMin: '',
+    complianceMax: '',
+    performanceRating: 'all',
+    vendors: [],
+    contractTypes: [],
+    itemCountMin: '',
+    itemCountMax: '',
+    lastModifiedDays: '',
+    expiringWithin: 'all',
+    riskLevel: 'all',
+    renewalStatus: 'all'
+  });
+
+  const handleViewContract = (contract: Contract) => {
+    setSelectedContract(contract);
+    setModalMode('view');
+    setIsModalOpen(true);
+  };
+
+  const handleSaveContract = (updatedContract: Contract) => {
+    console.log('Saving contract:', updatedContract);
+  };
+
+  const handleUploadContract = (contractData: any) => {
+    console.log('Uploading contract:', contractData);
+  };
+
+  const handleDeleteContract = (contractId: string) => {
+    console.log('Deleting contract:', contractId);
+    setShowDropdownId(null);
+  };
+
+  const handleExportContract = (contractId: string) => {
+    console.log('Exporting contract:', contractId);
+    setShowDropdownId(null);
+  };
+
+  const handleAdvancedFilters = (filters: FilterValues) => {
+    setAdvancedFilters(filters);
+    console.log('Applied advanced filters:', filters);
+  };
 
   const getStatusBadge = (status: string) => {
     const baseClasses = "px-3 py-1 rounded-full text-xs font-medium";
@@ -122,7 +181,35 @@ export const ContractList: React.FC = () => {
     const matchesSearch = contract.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          contract.vendor.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || contract.status === filterStatus;
-    return matchesSearch && matchesFilter;
+    
+    // Apply advanced filters if any are set
+    let matchesAdvanced = true;
+    if (advancedFilters && Object.keys(advancedFilters).length > 0) {
+      // Status filter
+      if (advancedFilters.status?.length > 0) {
+        matchesAdvanced = matchesAdvanced && advancedFilters.status.includes(contract.status);
+      }
+      
+      // Vendor filter
+      if (advancedFilters.vendors?.length > 0) {
+        matchesAdvanced = matchesAdvanced && advancedFilters.vendors.includes(contract.vendor);
+      }
+      
+      // Contract type filter
+      if (advancedFilters.contractTypes?.length > 0) {
+        matchesAdvanced = matchesAdvanced && advancedFilters.contractTypes.includes(contract.type);
+      }
+      
+      // Compliance range filter
+      if (advancedFilters.complianceMin) {
+        matchesAdvanced = matchesAdvanced && contract.compliance >= parseInt(advancedFilters.complianceMin);
+      }
+      if (advancedFilters.complianceMax) {
+        matchesAdvanced = matchesAdvanced && contract.compliance <= parseInt(advancedFilters.complianceMax);
+      }
+    }
+    
+    return matchesSearch && matchesFilter && matchesAdvanced;
   });
 
   return (
@@ -135,7 +222,7 @@ export const ContractList: React.FC = () => {
             Manage and monitor your vendor contracts and agreements
           </p>
         </div>
-        <Button variant="primary" size="lg">
+        <Button variant="primary" size="lg" onClick={() => setIsUploadModalOpen(true)}>
           <FileText className="w-5 h-5 mr-2" />
           Upload Contract
         </Button>
@@ -184,7 +271,7 @@ export const ContractList: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" onClick={() => setIsAdvancedFiltersOpen(true)}>
               <Filter className="w-4 h-4 mr-2" />
               Advanced Filters
             </Button>
@@ -262,22 +349,39 @@ export const ContractList: React.FC = () => {
                       {contract.itemsCount} items • Last modified {new Date(contract.lastModified).toLocaleDateString()}
                     </p>
                     <div className="flex items-center space-x-2">
-                      <Button variant="secondary" size="sm">
+                      <Button variant="secondary" size="sm" onClick={() => handleViewContract(contract)}>
                         <Eye className="w-4 h-4 mr-1" />
-                        View
+                        View Details
                       </Button>
-                      <Button variant="secondary" size="sm">
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
-                      </Button>
-                      <button className="p-2 rounded hover:bg-slate-100 transition-colors">
-                        <MoreVertical className="w-4 h-4 text-slate-500" />
-                      </button>
+                      <div className="relative">
+                        <button 
+                          className="p-2 rounded hover:bg-slate-100 transition-colors"
+                          onClick={() => setShowDropdownId(showDropdownId === contract.id ? null : contract.id)}
+                        >
+                          <MoreVertical className="w-4 h-4 text-slate-500" />
+                        </button>
+                        {showDropdownId === contract.id && (
+                          <div className="absolute right-0 top-10 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-10">
+                            <button
+                              onClick={() => handleExportContract(contract.id)}
+                              className="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm text-slate-700 flex items-center"
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Export Contract
+                            </button>
+                            <button
+                              onClick={() => handleDeleteContract(contract.id)}
+                              className="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm text-red-600 flex items-center"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete Contract
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-                
-                <ChevronRight className="w-5 h-5 text-slate-400 ml-4" />
               </div>
             </Card>
           </motion.div>
@@ -326,6 +430,32 @@ export const ContractList: React.FC = () => {
           <p className="text-sm text-slate-600">Vendors</p>
         </Card>
       </div>
+
+      {/* Contract Details Modal */}
+      {selectedContract && (
+        <ContractDetailsModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          contract={selectedContract}
+          mode={modalMode}
+          onSave={handleSaveContract}
+        />
+      )}
+
+      {/* Contract Upload Modal */}
+      <ContractUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUpload={handleUploadContract}
+      />
+
+      {/* Advanced Filters Modal */}
+      <AdvancedFiltersModal
+        isOpen={isAdvancedFiltersOpen}
+        onClose={() => setIsAdvancedFiltersOpen(false)}
+        onApplyFilters={handleAdvancedFilters}
+        currentFilters={advancedFilters}
+      />
     </div>
   );
 };
