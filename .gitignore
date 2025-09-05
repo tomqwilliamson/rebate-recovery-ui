@@ -51,6 +51,13 @@ dist-ssr
 # Output of 'npm pack'
 *.tgz
 
+# Deployment artifacts
+*.zip
+dist.zip
+deploy.zip
+*.tar.gz
+*.tar
+
 # Yarn Integrity file
 .yarn-integrity
 
